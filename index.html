@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game Day Bingo</title>
+<meta name="description" content="Free printable bingo cards written for a specific game: the teams, players, ballpark and storylines.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2313294B'/%3E%3Cpath d='M8 8h6v6H8zM18 8h6v6h-6zM8 18h6v6H8zM18 18h6v6h-6z' fill='%23F2B544'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* Layout: a two-pane tool. Settings on the left, a true-to-print card preview on the right; stacks on phones. */
+:root {
+  --bg: #EEF1F5;
+  --surface: #FFFFFF;
+  --ink: #13294B;
+  --muted: #4F5D75;
+  --line: #CBD3DF;
+  --accent: #F2B544;
+  --accent-ink: #13294B;
+  --focus: #2F6FD6;
+  --c-team: #2F6FD6;
+  --c-venue: #148060;
+  --c-story: #D0650F;
+  --c-generic: #98A2B3;
+  --ok: #17703F;
+  --err: #B42318;
+  --card-bg: #FFFFFF;
+  --card-ink: #13294B;
+  --card-muted: #8A5A00;
+  --display: 'Oswald', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  --body: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1524; --surface: #152038; --ink: #E6ECF5; --muted: #A9B5C9; --line: #2C3D5C;
+    --accent: #F2B544; --accent-ink: #13294B; --focus: #7FAAF5;
+    --c-team: #7FAAF5; --c-venue: #4CC7A2; --c-story: #F2A45A; --c-generic: #7D889C;
+    --ok: #62D394; --err: #FF8E80; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1524; --surface: #152038; --ink: #E6ECF5; --muted: #A9B5C9; --line: #2C3D5C;
+  --accent: #F2B544; --accent-ink: #13294B; --focus: #7FAAF5;
+  --c-team: #7FAAF5; --c-venue: #4CC7A2; --c-story: #F2A45A; --c-generic: #7D889C;
+  --ok: #62D394; --err: #FF8E80; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+.site-foot { border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+.site-foot p { margin: 0; max-width: 80ch; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+.page { max-width: 1240px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.brand h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 30px; letter-spacing: .02em; text-transform: uppercase; line-height: 1; }
+.chip { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
+.top p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 880px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+.group { display: flex; flex-direction: column; gap: 8px; border: 0; margin: 0; padding: 0; min-width: 0; }
+.group > legend, .lbl { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0; margin-bottom: 8px; }
+.lbl { margin-bottom: 0; }
+.games { display: flex; flex-direction: column; gap: 8px; }
+.game-opt { position: relative; display: block; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px 10px 38px; cursor: pointer; }
+.game-opt input { position: absolute; left: 12px; top: 13px; accent-color: var(--ink); }
+.game-opt:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.game-opt strong { display: block; font-weight: 700; }
+.game-opt span { color: var(--muted); font-size: 13.5px; }
+.when { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); border-radius: 4px; padding: 0 6px; margin-left: 6px; vertical-align: 2px; }
+
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+input[type="number"], input[type="text"], select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0; }
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg label { position: relative; text-align: center; padding: 8px 4px; cursor: pointer; font-weight: 600; font-size: 14px; border-left: 1px solid var(--line); }
+.seg label:first-child { border-left: 0; }
+.seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.seg label:has(input:checked) { background: var(--ink); color: var(--surface); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: -3px; }
+.hint { margin: 0; font-size: 13px; color: var(--muted); }
+.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--ink); }
+
+.actions { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 16px; }
+.btn { font: inherit; font-weight: 700; border-radius: 8px; padding: 11px 14px; cursor: pointer; border: 1px solid var(--ink); background: transparent; color: var(--ink); min-height: 44px; }
+.btn.primary { background: var(--ink); color: var(--surface); }
+.btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.status { min-height: 20px; margin: 0; font-size: 14px; color: var(--muted); }
+.status.ok { color: var(--ok); } .status.err { color: var(--err); }
+
+.stage { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.matchup { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 6px 28px; align-items: baseline; }
+.matchup h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 24px; text-transform: uppercase; letter-spacing: .02em; width: 100%; line-height: 1.1; }
+.matchup .eyebrow { width: 100%; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.fact { font-size: 14px; } .fact b { font-weight: 600; color: var(--muted); margin-right: 4px; }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.pager { display: flex; align-items: center; gap: 8px; }
+.pager .btn { padding: 6px 14px; min-height: 40px; }
+.pager span { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 9ch; text-align: center; }
+.stats { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 13px; font-weight: 600; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; background: var(--surface); font-variant-numeric: tabular-nums; }
+.pill.good { border-color: var(--ok); color: var(--ok); }
+
+/* The card preview mirrors the printed page, so it keeps paper colors in both themes. */
+.bcard { background: var(--card-bg); color: var(--card-ink); border-radius: 6px; box-shadow: 0 1px 2px rgba(10, 20, 40, .12), 0 8px 24px rgba(10, 20, 40, .10); padding: clamp(14px, 3.4vw, 36px); width: 100%; max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+.bc-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; border-bottom: 3px solid var(--card-ink); padding-bottom: 10px; flex-wrap: wrap; }
+.bc-l { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 260px; }
+.bc-eyebrow { font-size: clamp(9px, 1.4vw, 12px); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--card-muted); }
+.bc-title { font-family: var(--display); font-weight: 700; font-size: clamp(22px, 4.6vw, 44px); line-height: 1; text-transform: uppercase; text-wrap: balance; overflow-wrap: anywhere; }
+.bc-sub { font-family: var(--display); font-weight: 500; font-size: clamp(13px, 2vw, 18px); text-transform: uppercase; letter-spacing: .06em; }
+.bc-r { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: auto; flex: 0 0 auto; }
+.bc-no { background: var(--accent); color: var(--card-ink); font-family: var(--display); font-weight: 700; font-size: clamp(13px, 2vw, 18px); padding: 4px 12px; text-transform: uppercase; letter-spacing: .06em; }
+.bc-name { font-size: clamp(11px, 1.5vw, 14px); font-weight: 600; white-space: nowrap; }
+.bc-letters, .bc-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(3px, .6vw, 6px); }
+.bc-letters span { background: var(--card-ink); color: var(--card-bg); font-family: var(--display); font-weight: 700; font-size: clamp(18px, 3.6vw, 34px); text-align: center; line-height: 1.3; }
+.sq { position: relative; aspect-ratio: 1 / .9; border: 2px solid var(--card-ink); background: var(--card-bg); color: var(--card-ink); font: inherit; font-weight: 600; font-size: clamp(9.5px, 1.55vw, 15px); line-height: 1.15; display: flex; align-items: center; justify-content: center; text-align: center; padding: clamp(3px, .8vw, 8px); cursor: pointer; overflow: hidden; overflow-wrap: anywhere; hyphens: auto; }
+.sq:hover { background: #F4F7FB; }
+.sq.free { background: var(--accent); cursor: default; flex-direction: column; gap: 2px; }
+.sq.free b { font-family: var(--display); font-size: clamp(16px, 3vw, 30px); text-transform: uppercase; line-height: 1; }
+.sq.free small { font-size: clamp(8px, 1.1vw, 11px); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.sq.swapped { animation: flash .6s ease-out; }
+@keyframes flash { from { background: #FFF1CC; } to { background: var(--card-bg); } }
+@media (prefers-reduced-motion: reduce) { .sq.swapped { animation: none; } }
+.types .sq:not(.free)::before { content: ""; position: absolute; left: 5px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--dot); }
+.types .sq.t3::after { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 14px 14px 0; border-color: transparent #13294B transparent transparent; }
+.cat-team { --dot: #2F6FD6; } .cat-venue { --dot: #148060; } .cat-story { --dot: #D0650F; } .cat-generic { --dot: #98A2B3; }
+.bc-foot { margin: 0; font-size: clamp(10px, 1.4vw, 13px); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); align-items: center; justify-content: center; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.legend .tri { width: 0; height: 0; border-radius: 0; border-style: solid; border-width: 0 12px 12px 0; border-color: transparent var(--ink) transparent transparent; }
+.note { margin: 0; text-align: center; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div class="brand">
+      <h1>Game Day Bingo</h1>
+      <span class="chip">Proof of concept</span>
+    </div>
+    <p>Pick a game and get unique bingo cards written for that matchup. Every card has at least 9 squares about these teams, players, ballpark or storylines.</p>
+  </header>
+
+  <div class="layout">
+    <form class="panel" id="controls" autocomplete="off">
+      <fieldset class="group">
+        <legend>Game</legend>
+        <div class="games" id="games"></div>
+      </fieldset>
+
+      <div class="row2">
+        <div class="field">
+          <label class="lbl" for="count">Cards</label>
+          <input id="count" type="number" min="1" max="100" value="8" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label class="lbl" for="paper">Paper</label>
+          <select id="paper">
+            <option value="letter">Letter</option>
+            <option value="a4">A4</option>
+          </select>
+        </div>
+      </div>
+
+      <fieldset class="group">
+        <legend>Difficulty</legend>
+        <div class="seg">
+          <label><input type="radio" name="diff" id="diff-easy" value="easy">Easy</label>
+          <label><input type="radio" name="diff" id="diff-standard" value="standard" checked>Standard</label>
+          <label><input type="radio" name="diff" id="diff-long" value="long">Long shot</label>
+        </div>
+        <p class="hint" id="diff-hint"></p>
+      </fieldset>
+
+      <div class="field">
+        <label class="lbl" for="title">Title on the cards (optional)</label>
+        <input id="title" type="text" maxlength="40" placeholder="Sutton Watch Party">
+      </div>
+
+      <fieldset class="group">
+        <legend>Print options</legend>
+        <div class="field">
+          <label class="lbl" for="perpage" style="text-transform:none;letter-spacing:0;font-size:14px;font-weight:600;color:var(--ink)">Cards per page</label>
+          <select id="perpage">
+            <option value="1">1 per page (portrait)</option>
+            <option value="2">2 per page (landscape)</option>
+          </select>
+        </div>
+        <label class="check"><input type="checkbox" id="free" checked>Free center square</label>
+        <label class="check"><input type="checkbox" id="checklist" checked>Add a host checklist page</label>
+        <label class="check"><input type="checkbox" id="ink">Ink saver (black and white)</label>
+      </fieldset>
+
+      <div class="actions">
+        <button class="btn primary" type="button" id="download">Download PDF</button>
+        <button class="btn" type="button" id="print">Open PDF to print</button>
+        <button class="btn" type="button" id="reshuffle">Deal a new set of cards</button>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <section class="stage" aria-label="Card preview">
+      <div class="matchup" id="matchup"></div>
+      <div class="bar">
+        <div class="pager">
+          <button class="btn" type="button" id="prev" aria-label="Previous card">Prev</button>
+          <span id="pos">Card 1 of 8</span>
+          <button class="btn" type="button" id="next" aria-label="Next card">Next</button>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+      <div class="bcard types" id="card"></div>
+      <div class="legend" aria-label="Square types">
+        <span><i style="background:var(--c-team)"></i>Teams &amp; players</span>
+        <span><i style="background:var(--c-venue)"></i>Ballpark &amp; broadcast</span>
+        <span><i style="background:var(--c-story)"></i>Tonight's storylines</span>
+        <span><i style="background:var(--c-generic)"></i>Any game</span>
+        <span><i class="tri"></i>Long shot</span>
+        <label class="check"><input type="checkbox" id="showtypes" checked>Show on preview</label>
+      </div>
+      <p class="note">Click any square to swap it for a similar one. Dots and flags appear only on the preview, not in the PDF.</p>
+    </section>
+  </div>
+
+  <footer class="site-foot">
+    <p>Game Day Bingo is a free fan project. It is not affiliated with, endorsed by or sponsored by Major League Baseball or any team. Team and player names are used only to describe the games.</p>
+    <p>Cards are made in your browser. Nothing you type is sent anywhere or stored.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Square library ----------
+  // tier: 1 = likely (over 70%), 2 = toss-up (30-70%), 3 = long shot (under 30%)
+  var GENERIC = [
+    ['Strikeout looking', 1], ['Pitching change', 1], ['Mound visit', 1], ['Walk', 1],
+    ['Fan catches a foul ball', 1], ['1-2-3 inning', 1], ['Strikeout ends an inning', 1],
+    ['Runner stranded on 3rd', 1], ['Ground-ball double play', 1], ['Pinch hitter', 1],
+    ['Pickoff throw', 1], ['Full-count walk', 1], ['Leadoff batter reaches base', 1],
+    ['ABS ball-strike challenge', 1], ['Double', 1],
+    ['Home run', 2], ['Stolen base', 2], ['Hit by pitch', 2], ['Wild pitch', 2], ['Fielding error', 2],
+    ['Diving catch', 2], ['Sacrifice fly', 2], ['Two-out RBI', 2], ['Infield single', 2],
+    ['Bases loaded', 2], ['Caught stealing', 2], ['Lead changes hands', 2], ['Broken bat', 2],
+    ['Bunt attempt', 2], ['Replay review', 2], ['Ground-rule double', 2], ['Scoreless 1st inning', 2],
+    ['Passed ball', 2], ['Multi-run homer', 2],
+    ['Runner thrown out at home', 3], ['Triple', 3], ['Extra innings', 3], ['Pitch clock violation', 3],
+    ['Balk', 3], ['Grand slam', 3], ['Manager ejected', 3], ['Back-to-back homers', 3],
+    ['Catcher’s interference', 3]
+  ];
+
+  var TEAMS = {
+    rays: {
+      name: 'Rays', city: 'Tampa Bay', abbr: 'TB',
+      squares: [
+        ['Caminero gets a hit', 1], ['Aranda reaches base', 1], ['Kevin Cash makes a pitching change', 1],
+        ['Chandler Simpson steals a base', 2], ['Yandy Díaz gets a hit', 2], ['Jorge Mateo pinch-runs', 2],
+        ['Bryan Baker pitches the 9th', 2], ['Rays score first', 2],
+        ['Caminero homers', 3], ['DeLuca makes a diving catch', 3], ['Rays steal 2+ bases', 3]
+      ]
+    },
+    brewers: {
+      name: 'Brewers', city: 'Milwaukee', abbr: 'MIL',
+      squares: [
+        ['Chourio gets a hit', 1],
+        ['Yelich drives in a run', 2], ['Contreras wins an ABS challenge', 2], ['Bauers gets a hit', 2],
+        ['Cooper Pratt gets a hit', 2], ['Megill records the save', 2], ['Uribe hits 100 mph', 2],
+        ['Brewers score first', 2],
+        ['Contreras throws out a base stealer', 3], ['Woodruff pitches in relief', 3],
+        ['Turang steals a base', 3], ['Pat Murphy argues a call', 3]
+      ]
+    }
+  };
+
+  var VENUES = {
+    aff: {
+      name: 'American Family Field', city: 'Milwaukee',
+      squares: [
+        ['Bernie Brewer goes down the slide', 2], ['Sausage Race shown on TV', 2],
+        ['“Roll Out the Barrel” in the 7th', 2], ['Broadcast mentions the roof', 2]
+      ]
+    },
+    trop: {
+      name: 'Tropicana Field', city: 'St. Petersburg',
+      squares: [
+        ['Ball hits a catwalk', 3], ['Cowbells heard on the broadcast', 2],
+        ['Broadcast mentions the 2008 World Series', 2]
+      ]
+    }
+  };
+
+  var GAMES = {
+    g2: {
+      key: 'g2', title: 'World Series Game 2', short: 'Game 2', iso: '2026-10-24',
+      date: 'Sat, Oct 24', time: '7:00 PM CT', away: 'rays', home: 'brewers', venue: 'aff',
+      series: 'Brewers lead 1–0 after a 3–2 win in Game 1',
+      probables: 'Drew Rasmussen (TB) vs. Logan Henderson (MIL)',
+      story: [
+        ['Broadcast mentions the Adames trade', 1],
+        ['Rasmussen strikes out 6+', 2, 'rays'], ['Rasmussen pitches 6+ innings', 2, 'rays'],
+        ['Henderson strikes out 5+', 2, 'brewers'], ['Henderson pitches into the 6th', 2, 'brewers'],
+        ['Misiorowski’s 103.5 mph pitch replayed', 2], ['Game 1’s overturned double play replayed', 2],
+        ['Broadcast mentions 1982', 2], ['Rays tie the series 1–1', 2, 'rays'],
+        ['Brewers go up 2–0 in the series', 2, 'brewers']
+      ]
+    },
+    g3: {
+      key: 'g3', title: 'World Series Game 3', short: 'Game 3', iso: '2026-10-26',
+      date: 'Mon, Oct 26', time: '7:00 PM CT', away: 'brewers', home: 'rays', venue: 'trop',
+      series: 'Series moves to St. Petersburg',
+      probables: 'Freddy Peralta (TB) vs. to be announced (MIL)',
+      story: [
+        ['Broadcast mentions Peralta’s Brewers years', 1],
+        ['Peralta strikes out 6+', 2, 'rays'], ['Peralta pitches 6+ innings', 2, 'rays'],
+        ['Brewers starter goes 5+ innings', 2, 'brewers'], ['Rays bullpen gets 9+ outs', 2, 'rays'],
+        ['Highlight from Game 2 replayed', 1]
+      ]
+    }
+  };
+
+  var CATS = { team: 'Teams & players', venue: 'Ballpark & broadcast', story: 'Tonight’s storylines', generic: 'Any game' };
+  var TIERS = { 1: 'Likely', 2: 'Toss-up', 3: 'Long shot' };
+  var DIFF = {
+    easy: { w: { 1: .6, 2: .37, 3: .03 }, t3: 2, t1f: .5, hint: 'About half the squares are likely to happen. Expect a bingo by the middle innings.' },
+    standard: { w: { 1: .38, 2: .5, 3: .12 }, t3: 4, t1f: .36, hint: 'A mix of likely plays and toss-ups, plus about 4 long shots. Bingos usually come late.' },
+    long: { w: { 1: .25, 2: .45, 3: .3 }, t3: 7, t1f: .24, hint: 'Lots of toss-ups and about 7 long shots. Some nights nobody wins.' }
+  };
+  var LINES = (function () {
+    var L = [], r, c;
+    for (r = 0; r < 5; r++) L.push([0, 1, 2, 3, 4].map(function (x) { return r * 5 + x; }));
+    for (c = 0; c < 5; c++) L.push([0, 1, 2, 3, 4].map(function (x) { return x * 5 + c; }));
+    L.push([0, 6, 12, 18, 24], [4, 8, 12, 16, 20]);
+    return L;
+  })();
+
+  // ---------- Helpers ----------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function hashStr(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function shuffle(a, rng) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rng() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function pickOne(a, rng) { return a[Math.floor(rng() * a.length)]; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function $(id) { return document.getElementById(id); }
+  function lineOk(cells) { return LINES.every(function (l) { return l.filter(function (i) { return cells[i] && cells[i].tier === 3; }).length <= 2; }); }
+
+  // ---------- State ----------
+  var st = { gameKey: 'g2', count: 8, diff: 'standard', free: true, title: '', paper: 'letter', perPage: 1, ink: false, checklist: true, seed: 2410, idx: 0, cards: [], pool: [] };
+
+  function buildPool(g) {
+    var out = [];
+    GENERIC.forEach(function (s) { out.push({ id: 'g:' + s[0], text: s[0], tier: s[1], cat: 'generic' }); });
+    [g.away, g.home].forEach(function (k) {
+      TEAMS[k].squares.forEach(function (s) { out.push({ id: k + ':' + s[0], text: s[0], tier: s[1], cat: 'team', side: k }); });
+    });
+    VENUES[g.venue].squares.forEach(function (s) { out.push({ id: 'v:' + s[0], text: s[0], tier: s[1], cat: 'venue' }); });
+    g.story.forEach(function (s) { out.push({ id: 's:' + s[0], text: s[0], tier: s[1], cat: 'story', side: s[2] || null }); });
+    return out;
+  }
+
+  function place(picks, rng) {
+    var cells;
+    for (var t = 0; t < 400; t++) {
+      var p = shuffle(picks.slice(), rng), k = 0;
+      cells = [];
+      for (var i = 0; i < 25; i++) cells.push(st.free && i === 12 ? { free: true } : p[k++]);
+      if (lineOk(cells)) return cells;
+    }
+    return cells;
+  }
+
+  function makeCard(rng, pool, prev) {
+    var d = DIFF[st.diff], N = st.free ? 24 : 25, g = GAMES[st.gameKey];
+    var gen = pool.filter(function (q) { return q.cat === 'generic'; });
+    var homeL = pool.filter(function (q) { return q.cat === 'team' && q.side === g.home; });
+    var awayL = pool.filter(function (q) { return q.cat === 'team' && q.side === g.away; });
+    var neuL = pool.filter(function (q) { return q.cat === 'venue' || q.cat === 'story'; });
+    var specL = pool.filter(function (q) { return q.cat !== 'generic'; });
+    var best = null;
+    for (var attempt = 0; attempt < 80; attempt++) {
+      var used = {}, picks = [];
+      var take = function (q) { used[q.id] = 1; picks.push(q); };
+      var free = function (q) { return !used[q.id]; };
+      var tierPick = function () { var r = rng(); return r < d.w[1] ? 1 : (r < d.w[1] + d.w[2] ? 2 : 3); };
+      var draw = function (list, k) {
+        for (var j = 0; j < k; j++) {
+          var t = tierPick();
+          var c = list.filter(function (q) { return free(q) && q.tier === t; });
+          if (!c.length) c = list.filter(free);
+          if (!c.length) return;
+          take(pickOne(c, rng));
+        }
+      };
+      var S = 9 + Math.floor(rng() * 4);
+      var neutral = Math.round(S * 0.35), half = S - neutral;
+      var homeN = Math.floor(half / 2), awayN = half - homeN;
+      if (rng() < .5) { var sw = homeN; homeN = awayN; awayN = sw; }
+      draw(homeL, homeN); draw(awayL, awayN); draw(neuL, neutral);
+      while (picks.length < 9) { var c0 = specL.filter(free); if (!c0.length) break; take(pickOne(c0, rng)); }
+
+      var target = { 1: Math.round(N * d.t1f), 3: d.t3 }; target[2] = N - target[1] - target[3];
+      var u = { 1: 0, 2: 0, 3: 0 }; picks.forEach(function (q) { u[q.tier]++; });
+      var rem = { 1: Math.max(0, target[1] - u[1]), 2: Math.max(0, target[2] - u[2]), 3: Math.max(0, target[3] - u[3]) };
+      var need = N - picks.length, sum = rem[1] + rem[2] + rem[3];
+      while (sum > need) { if (rem[2] > 0) rem[2]--; else if (rem[1] > 0) rem[1]--; else rem[3]--; sum--; }
+      while (sum < need) { rem[2]++; sum++; }
+      [3, 1, 2].forEach(function (t) {
+        for (var j = 0; j < rem[t]; j++) {
+          var c = gen.filter(function (q) { return free(q) && q.tier === t; });
+          if (!c.length) c = gen.filter(function (q) { return free(q) && q.tier === 2; });
+          if (!c.length) c = gen.filter(free);
+          if (!c.length) break;
+          take(pickOne(c, rng));
+        }
+      });
+      if (picks.length < N) continue;
+      var cells = place(picks, rng);
+      var ids = {}; picks.forEach(function (q) { ids[q.id] = 1; });
+      var tooClose = prev.some(function (p) {
+        var n = 0; p.cells.forEach(function (c) { if (c && !c.free && ids[c.id]) n++; });
+        return n > 0.6 * N;
+      });
+      best = { cells: cells };
+      if (!tooClose && lineOk(cells)) return best;
+    }
+    return best;
+  }
+
+  function specificCount(card) { return card.cells.filter(function (c) { return !c.free && c.cat !== 'generic'; }).length; }
+  function longCount(card) { return card.cells.filter(function (c) { return !c.free && c.tier === 3; }).length; }
+
+  function rebuild() {
+    var g = GAMES[st.gameKey];
+    st.pool = buildPool(g);
+    var rng = mulberry32((st.seed ^ hashStr(st.gameKey + st.diff + st.free)) >>> 0);
+    st.cards = [];
+    for (var i = 0; i < st.count; i++) st.cards.push(makeCard(rng, st.pool, st.cards));
+    st.idx = Math.min(st.idx, st.count - 1);
+    renderAll();
+  }
+
+  function swap(pos) {
+    var card = st.cards[st.idx], cur = card.cells[pos];
+    if (!cur || cur.free) return;
+    var inCard = {}; card.cells.forEach(function (c) { if (!c.free) inCard[c.id] = 1; });
+    var pool = st.pool.filter(function (q) { return !inCard[q.id]; });
+    var same = function (q) { return q.cat === cur.cat && (cur.cat !== 'team' || q.side === cur.side); };
+    var c = pool.filter(function (q) { return same(q) && q.tier === cur.tier; });
+    if (!c.length) c = pool.filter(same);
+    if (!c.length) c = pool.filter(function (q) { return (cur.cat === 'generic' || q.cat !== 'generic') && q.tier === cur.tier; });
+    c = c.filter(function (q) { var test = card.cells.slice(); test[pos] = q; return lineOk(test); });
+    if (!c.length) { setStatus('No other square fits in that spot.', ''); return; }
+    card.cells[pos] = pickOne(c, Math.random);
+    renderCard(pos);
+    setStatus('Swapped “' + cur.text + '” for “' + card.cells[pos].text + '”.', '');
+  }
+
+  // ---------- Rendering ----------
+  function isToday(iso) {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return iso === d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+
+  function renderGames() {
+    var html = '';
+    Object.keys(GAMES).forEach(function (k) {
+      var g = GAMES[k], a = TEAMS[g.away], h = TEAMS[g.home];
+      html += '<label class="game-opt"><input type="radio" name="game" id="game-' + k + '" value="' + k + '"' + (k === st.gameKey ? ' checked' : '') + '>' +
+        '<strong>' + esc(g.title) + (isToday(g.iso) ? '<span class="when">Tonight</span>' : '') + '</strong>' +
+        '<span>' + esc(a.name + ' at ' + h.name + ' · ' + g.date + ' · ' + g.time) + '</span></label>';
+    });
+    $('games').innerHTML = html;
+  }
+
+  function cardTitles(g) {
+    var a = TEAMS[g.away], h = TEAMS[g.home];
+    var custom = st.title.trim();
+    return {
+      eyebrow: (a.city + ' at ' + h.city + ' · ' + g.date + ' · ' + g.time + ' · ' + VENUES[g.venue].name).toUpperCase(),
+      title: custom || 'World Series Bingo',
+      sub: custom ? (g.title + ' · ' + a.name + ' at ' + h.name) : (g.short + ' · ' + a.name + ' at ' + h.name)
+    };
+  }
+
+  function renderMatchup() {
+    var g = GAMES[st.gameKey], a = TEAMS[g.away], h = TEAMS[g.home];
+    $('matchup').innerHTML =
+      '<div class="eyebrow">' + esc(g.title) + '</div>' +
+      '<h2>' + esc(a.city + ' ' + a.name + ' at ' + h.city + ' ' + h.name) + '</h2>' +
+      '<span class="fact"><b>When</b>' + esc(g.date + ', ' + g.time) + '</span>' +
+      '<span class="fact"><b>Where</b>' + esc(VENUES[g.venue].name + ', ' + VENUES[g.venue].city) + '</span>' +
+      '<span class="fact"><b>Starters</b>' + esc(g.probables) + '</span>' +
+      '<span class="fact"><b>Series</b>' + esc(g.series) + '</span>';
+  }
+
+  function renderCard(flashPos) {
+    var g = GAMES[st.gameKey], card = st.cards[st.idx], t = cardTitles(g);
+    var cells = card.cells.map(function (c, i) {
+      if (c.free) return '<div class="sq free"><b>Free</b><small>First pitch</small></div>';
+      return '<button type="button" class="sq cat-' + c.cat + ' t' + c.tier + (i === flashPos ? ' swapped' : '') + '" data-pos="' + i + '" title="' + esc(CATS[c.cat] + ' · ' + TIERS[c.tier] + ' · click to swap') + '" aria-label="' + esc(c.text + '. ' + CATS[c.cat] + ', ' + TIERS[c.tier] + '. Swap this square') + '">' + esc(c.text) + '</button>';
+    }).join('');
+    $('card').innerHTML =
+      '<div class="bc-head"><div class="bc-l"><div class="bc-eyebrow">' + esc(t.eyebrow) + '</div>' +
+      '<div class="bc-title">' + esc(t.title) + '</div><div class="bc-sub">' + esc(t.sub) + '</div></div>' +
+      '<div class="bc-r"><div class="bc-no">Card ' + (st.idx + 1) + '</div><div class="bc-name">Name: ____________________</div></div></div>' +
+      '<div class="bc-letters" aria-hidden="true"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>' +
+      '<div class="bc-grid">' + cells + '</div>' +
+      '<p class="bc-foot"><strong>How to play:</strong> Mark a square when it happens during the game. Five in a row across, down or diagonal wins.' + (st.free ? ' The center is free.' : '') + '</p>';
+    $('pos').textContent = 'Card ' + (st.idx + 1) + ' of ' + st.cards.length;
+    $('prev').disabled = st.idx === 0;
+    $('next').disabled = st.idx >= st.cards.length - 1;
+    var spec = specificCount(card);
+    var minSpec = Math.min.apply(null, st.cards.map(specificCount));
+    $('stats').innerHTML =
+      '<span class="pill good">' + spec + ' of 25 squares about this game</span>' +
+      '<span class="pill">' + longCount(card) + ' long shots</span>' +
+      '<span class="pill">Every card: ' + minSpec + '+ game squares</span>';
+  }
+
+  function renderAll() {
+    renderMatchup();
+    renderCard(-1);
+    $('diff-hint').textContent = DIFF[st.diff].hint;
+  }
+
+  // ---------- Status ----------
+  function setStatus(msg, kind) { var s = $('status'); s.textContent = msg; s.className = 'status' + (kind ? ' ' + kind : ''); }
+
+  // ---------- PDF ----------
+  function clean(s) {
+    return String(s).replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, '-').replace(/·/g, '|');
+  }
+
+  function fitLines(doc, text, w, h, maxPt, minPt) {
+    for (var pt = maxPt; pt >= minPt; pt -= 0.5) {
+      doc.setFontSize(pt);
+      var lines = doc.splitTextToSize(text, w);
+      var wordsFit = text.split(/\s+/).every(function (wd) { return doc.getTextWidth(wd) <= w + 0.5; });
+      var ok = wordsFit && lines.length * pt * 1.18 <= h && lines.every(function (l) { return doc.getTextWidth(l) <= w + 0.5; });
+      if (ok) return { lines: lines, pt: pt };
+    }
+    doc.setFontSize(minPt);
+    return { lines: doc.splitTextToSize(text, w), pt: minPt };
+  }
+
+  function fitSingle(doc, text, w, maxPt, minPt) {
+    var pt = maxPt; doc.setFontSize(pt);
+    while (pt > minPt && doc.getTextWidth(text) > w) { pt -= 0.5; doc.setFontSize(pt); }
+    return pt;
+  }
+
+  function drawCard(doc, card, i, x, y, w, h, s) {
+    var g = GAMES[st.gameKey], t = cardTitles(g);
+    var ink = st.ink ? [0, 0, 0] : [19, 41, 75];
+    var eyebrowC = st.ink ? [70, 70, 70] : [138, 90, 0];
+    var freeFill = st.ink ? [225, 225, 225] : [242, 181, 68];
+
+    // header
+    var rightW = 150 * s;
+    doc.setTextColor.apply(doc, eyebrowC);
+    doc.setFont('helvetica', 'bold');
+    fitSingle(doc, clean(t.eyebrow), w, 8.5 * s, 5.5);
+    doc.text(clean(t.eyebrow), x, y + 9 * s);
+
+    doc.setTextColor.apply(doc, ink);
+    var titleText = clean(t.title.toUpperCase());
+    var tp = fitSingle(doc, titleText, w - rightW - 10 * s, 30 * s, 12);
+    doc.text(titleText, x, y + 14 * s + tp * 0.85);
+    var subY = y + 14 * s + tp * 0.85 + 18 * s;
+    doc.setFont('helvetica', 'normal');
+    fitSingle(doc, clean(t.sub.toUpperCase()), w - rightW - 10 * s, 12 * s, 7);
+    doc.text(clean(t.sub.toUpperCase()), x, subY);
+
+    // card number box + name line
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12 * s);
+    var noText = 'CARD ' + (i + 1);
+    var noW = doc.getTextWidth(noText) + 16 * s, noH = 20 * s;
+    doc.setFillColor.apply(doc, freeFill);
+    doc.rect(x + w - noW, y + 16 * s, noW, noH, 'F');
+    doc.text(noText, x + w - noW / 2, y + 16 * s + noH / 2 + 4.2 * s, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5 * s);
+    doc.text('Name: ______________________', x + w, subY, { align: 'right' });
+
+    var ruleY = subY + 8 * s;
+    doc.setDrawColor.apply(doc, ink);
+    doc.setLineWidth(2.2 * s);
+    doc.line(x, ruleY, x + w, ruleY);
+
+    // letters row
+    var gap = 4 * s, cw = (w - 4 * gap) / 5;
+    var ly = ruleY + 10 * s, lh = 26 * s;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20 * s);
+    'BINGO'.split('').forEach(function (L, c) {
+      var cx = x + c * (cw + gap);
+      if (st.ink) { doc.setLineWidth(1.4 * s); doc.rect(cx, ly, cw, lh, 'S'); doc.setTextColor(0, 0, 0); }
+      else { doc.setFillColor.apply(doc, ink); doc.rect(cx, ly, cw, lh, 'F'); doc.setTextColor(255, 255, 255); }
+      doc.text(L, cx + cw / 2, ly + lh / 2 + 7 * s, { align: 'center' });
+    });
+
+    // grid
+    var footH = 20 * s;
+    var gy = ly + lh + gap;
+    var ch = (y + h - footH - gy - 4 * gap) / 5;
+    doc.setLineWidth(1.5 * s);
+    doc.setDrawColor.apply(doc, ink);
+    card.cells.forEach(function (c, idx) {
+      var r = Math.floor(idx / 5), col = idx % 5;
+      var cx = x + col * (cw + gap), cy = gy + r * (ch + gap);
+      if (c.free) {
+        doc.setFillColor.apply(doc, freeFill);
+        doc.rect(cx, cy, cw, ch, 'FD');
+        doc.setTextColor.apply(doc, ink);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(Math.min(22 * s, ch * 0.3));
+        doc.text('FREE', cx + cw / 2, cy + ch / 2 + 2 * s, { align: 'center' });
+        doc.setFontSize(Math.max(5.5, 7 * s));
+        doc.text('FIRST PITCH', cx + cw / 2, cy + ch / 2 + 14 * s, { align: 'center' });
+        return;
+      }
+      doc.rect(cx, cy, cw, ch, 'S');
+      doc.setTextColor.apply(doc, ink);
+      doc.setFont('helvetica', 'bold');
+      var pad = 6 * s;
+      var f = fitLines(doc, clean(c.text), cw - 2 * pad, ch - 2 * pad, 11.5 * s, 5.5);
+      doc.setFontSize(f.pt);
+      var lhT = f.pt * 1.18, total = f.lines.length * lhT;
+      var by = cy + (ch - total) / 2 + f.pt * 0.88;
+      f.lines.forEach(function (ln, k) { doc.text(ln, cx + cw / 2, by + k * lhT, { align: 'center' }); });
+    });
+
+    // footer
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor.apply(doc, ink);
+    var foot = 'How to play: Mark a square when it happens. Five in a row across, down or diagonal wins.' + (st.free ? ' The center is free.' : '');
+    fitSingle(doc, foot, w - 70 * s, 8.5 * s, 5.5);
+    doc.text(foot, x, y + h - 4 * s);
+    doc.setFontSize(Math.max(5.5, 7 * s));
+    doc.setTextColor(110, 110, 110);
+    doc.text('Set ' + st.seed + ' | card ' + (i + 1), x + w, y + h - 4 * s, { align: 'right' });
+  }
+
+  function drawChecklist(doc) {
+    var g = GAMES[st.gameKey], a = TEAMS[g.away], h = TEAMS[g.home];
+    var W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), m = 48;
+    var counts = {}, sq = {};
+    st.cards.forEach(function (c) { c.cells.forEach(function (x) { if (!x.free) { counts[x.id] = (counts[x.id] || 0) + 1; sq[x.id] = x; } }); });
+    var order = ['team', 'venue', 'story', 'generic'];
+    var items = Object.keys(sq).map(function (k) { return sq[k]; }).sort(function (p, q) {
+      return order.indexOf(p.cat) - order.indexOf(q.cat) || p.text.localeCompare(q.text);
+    });
+    var ink = st.ink ? [0, 0, 0] : [19, 41, 75];
+    var header = function (cont) {
+      doc.setTextColor.apply(doc, ink);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+      doc.text('HOST CHECKLIST' + (cont ? ' (CONTINUED)' : ''), m, m + 10);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+      doc.text(clean(g.title + ' | ' + a.name + ' at ' + h.name + ' | ' + g.date + ' | ' + st.cards.length + ' cards, set ' + st.seed), m, m + 28);
+      doc.setFontSize(9); doc.setTextColor(90, 90, 90);
+      doc.text('Tick each square as it happens. The number shows how many cards have that square.', m, m + 42);
+      doc.setDrawColor.apply(doc, ink); doc.setLineWidth(1.5); doc.line(m, m + 50, W - m, m + 50);
+    };
+    header(false);
+    var colW = (W - 2 * m - 24) / 2, rowH = 15.5, top = m + 70, col = 0, yy = top, lastCat = null;
+    var advance = function (need) {
+      if (yy + need > H - m) {
+        if (col === 0) { col = 1; yy = top; }
+        else { doc.addPage(st.paper, 'portrait'); header(true); col = 0; yy = top; }
+      }
+    };
+    items.forEach(function (it) {
+      var x0 = m + col * (colW + 24);
+      if (it.cat !== lastCat) {
+        advance(rowH * 2.2);
+        x0 = m + col * (colW + 24);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor.apply(doc, ink);
+        doc.text(clean(CATS[it.cat]).toUpperCase(), x0, yy + 6);
+        yy += rowH * 1.2; lastCat = it.cat;
+      }
+      advance(rowH);
+      x0 = m + col * (colW + 24);
+      doc.setDrawColor.apply(doc, ink); doc.setLineWidth(0.8);
+      doc.rect(x0, yy - 1, 9, 9, 'S');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(20, 20, 20);
+      var label = clean(it.text);
+      fitSingle(doc, label, colW - 46, 9.5, 6.5);
+      doc.text(label, x0 + 15, yy + 7);
+      doc.setFontSize(8.5); doc.setTextColor(100, 100, 100);
+      doc.text(String(counts[it.id]), x0 + colW, yy + 7, { align: 'right' });
+      yy += rowH;
+    });
+  }
+
+  function buildPdf() {
+    var jsPDF = window.jspdf.jsPDF;
+    var two = st.perPage === 2;
+    var doc = new jsPDF({ unit: 'pt', format: st.paper, orientation: two ? 'landscape' : 'portrait' });
+    var W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+    var m = two ? 30 : 40;
+    st.cards.forEach(function (card, i) {
+      if (!two) {
+        if (i > 0) doc.addPage(st.paper, 'portrait');
+        var bw = W - 2 * m;
+        drawCard(doc, card, i, m, m, bw, H - 2 * m, bw / 532);
+      } else {
+        var slot = i % 2, gap = 36, bw2 = (W - 2 * m - gap) / 2;
+        if (i > 0 && slot === 0) doc.addPage(st.paper, 'landscape');
+        if (slot === 0) {
+          doc.setDrawColor(170, 170, 170); doc.setLineWidth(0.6);
+          doc.setLineDashPattern([4, 4], 0); doc.line(W / 2, 14, W / 2, H - 14); doc.setLineDashPattern([], 0);
+        }
+        drawCard(doc, card, i, m + slot * (bw2 + gap), m, bw2, H - 2 * m, bw2 / 532);
+      }
+    });
+    if (st.checklist) { doc.addPage(st.paper, 'portrait'); drawChecklist(doc); }
+    return doc.output('arraybuffer');
+  }
+
+  function makePdfBlob() {
+    if (!window.jspdf || !window.jspdf.jsPDF) { setStatus('The PDF tool didn’t load. Check your connection and reload the page.', 'err'); return null; }
+    setStatus('Building ' + st.cards.length + ' cards…', '');
+    try { return new Blob([buildPdf()], { type: 'application/pdf' }); }
+    catch (e) { setStatus('Couldn’t build the PDF: ' + e.message, 'err'); return null; }
+  }
+
+  function pdfName() {
+    var g = GAMES[st.gameKey];
+    return g.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-bingo-' + st.cards.length + '-cards.pdf';
+  }
+
+  function download() {
+    var blob = makePdfBlob();
+    if (!blob) return;
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = pdfName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    setStatus('PDF downloaded. Open it and print, or send it to your guests.', 'ok');
+  }
+
+  function openToPrint() {
+    var tab = window.open('', '_blank');
+    var blob = makePdfBlob();
+    if (!blob) { if (tab) tab.close(); return; }
+    var url = URL.createObjectURL(blob);
+    if (tab) { tab.location.href = url; setStatus('The PDF opened in a new tab. Use your browser’s Print button there.', 'ok'); }
+    else { setStatus('Your browser blocked the new tab. Use Download PDF instead.', 'err'); }
+  }
+
+  // ---------- Events ----------
+  function readCount() {
+    var n = parseInt($('count').value, 10);
+    if (isNaN(n)) n = 8;
+    n = Math.max(1, Math.min(100, n));
+    return n;
+  }
+
+  $('games').addEventListener('change', function (e) {
+    if (e.target.name === 'game') { st.gameKey = e.target.value; st.idx = 0; rebuild(); setStatus('', ''); }
+  });
+  $('count').addEventListener('change', function () { st.count = readCount(); $('count').value = st.count; rebuild(); });
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="diff"]'), function (r) {
+    r.addEventListener('change', function () { st.diff = r.value; rebuild(); });
+  });
+  $('free').addEventListener('change', function () { st.free = $('free').checked; rebuild(); });
+  $('title').addEventListener('input', function () { st.title = $('title').value; renderCard(-1); });
+  $('paper').addEventListener('change', function () { st.paper = $('paper').value; });
+  $('perpage').addEventListener('change', function () { st.perPage = parseInt($('perpage').value, 10); });
+  $('ink').addEventListener('change', function () { st.ink = $('ink').checked; });
+  $('checklist').addEventListener('change', function () { st.checklist = $('checklist').checked; });
+  $('showtypes').addEventListener('change', function () { $('card').classList.toggle('types', $('showtypes').checked); });
+  $('reshuffle').addEventListener('click', function () { st.seed = 1000 + Math.floor(Math.random() * 9000); st.idx = 0; rebuild(); setStatus('Dealt a new set of ' + st.count + ' cards.', ''); });
+  $('prev').addEventListener('click', function () { if (st.idx > 0) { st.idx--; renderCard(-1); } });
+  $('next').addEventListener('click', function () { if (st.idx < st.cards.length - 1) { st.idx++; renderCard(-1); } });
+  $('card').addEventListener('click', function (e) {
+    var b = e.target.closest('button.sq');
+    if (b) swap(parseInt(b.getAttribute('data-pos'), 10));
+  });
+  $('download').addEventListener('click', download);
+  $('print').addEventListener('click', openToPrint);
+  $('controls').addEventListener('submit', function (e) { e.preventDefault(); });
+
+  renderGames();
+  rebuild();
+})();
+</script>
+</body>
+</html>
