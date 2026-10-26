@@ -4,6 +4,7 @@
   "bingoTitle": "Baseball Bingo",
   "freeLabel": "First pitch",
   "tiers": "1 = likely (over 70%), 2 = toss-up (30-70%), 3 = long shot (under 30%)",
+  "checked": "Team names, ballparks and roofs checked October 2026. Re-check ballpark names before Opening Day 2027.",
   "generic": [
     ["Strikeout looking", 1], ["Pitching change", 1], ["Mound visit", 1], ["Walk", 1],
     ["Fan catches a foul ball", 1], ["1-2-3 inning", 1], ["Strikeout ends an inning", 1],
@@ -26,41 +27,92 @@
     ["{team} score 5+ runs", 2], ["{team} leave the bases loaded", 3]
   ],
   "roofSquares": {
-    "open": [["Rain delay", 3]],
+    "open": [["Rain delay", 3], ["Wind talked about on the broadcast", 2]],
     "dome": [],
     "retractable": [["Broadcast mentions the roof", 2]]
   },
   "venues": {
+    "chase": { "name": "Chase Field", "city": "Phoenix", "roof": "retractable" },
+    "truist": { "name": "Truist Park", "city": "Atlanta", "roof": "open" },
+    "camden": { "name": "Oriole Park at Camden Yards", "city": "Baltimore", "roof": "open" },
+    "fenway": { "name": "Fenway Park", "city": "Boston", "roof": "open" },
+    "wrigley": { "name": "Wrigley Field", "city": "Chicago", "roof": "open" },
+    "rate": { "name": "Rate Field", "city": "Chicago", "roof": "open" },
+    "gabp": { "name": "Great American Ball Park", "city": "Cincinnati", "roof": "open" },
+    "progressive": { "name": "Progressive Field", "city": "Cleveland", "roof": "open" },
+    "coors": { "name": "Coors Field", "city": "Denver", "roof": "open" },
+    "comerica": { "name": "Comerica Park", "city": "Detroit", "roof": "open" },
+    "daikin": { "name": "Daikin Park", "city": "Houston", "roof": "retractable" },
+    "kauffman": { "name": "Kauffman Stadium", "city": "Kansas City", "roof": "open" },
+    "angel": { "name": "Angel Stadium", "city": "Anaheim", "roof": "open" },
+    "dodger": { "name": "Dodger Stadium", "city": "Los Angeles", "roof": "open" },
+    "loandepot": { "name": "loanDepot park", "city": "Miami", "roof": "retractable" },
     "aff": { "name": "American Family Field", "city": "Milwaukee", "roof": "retractable" },
-    "trop": { "name": "Tropicana Field", "city": "St. Petersburg", "roof": "dome" }
+    "target": { "name": "Target Field", "city": "Minneapolis", "roof": "open" },
+    "citi": { "name": "Citi Field", "city": "New York", "roof": "open" },
+    "yankee": { "name": "Yankee Stadium", "city": "New York", "roof": "open" },
+    "sutter": { "name": "Sutter Health Park", "city": "West Sacramento", "roof": "open" },
+    "cbp": { "name": "Citizens Bank Park", "city": "Philadelphia", "roof": "open" },
+    "pnc": { "name": "PNC Park", "city": "Pittsburgh", "roof": "open" },
+    "petco": { "name": "Petco Park", "city": "San Diego", "roof": "open" },
+    "oracle": { "name": "Oracle Park", "city": "San Francisco", "roof": "open" },
+    "tmobile": { "name": "T-Mobile Park", "city": "Seattle", "roof": "retractable" },
+    "busch": { "name": "Busch Stadium", "city": "St. Louis", "roof": "open" },
+    "trop": { "name": "Tropicana Field", "city": "St. Petersburg", "roof": "dome" },
+    "globelife": { "name": "Globe Life Field", "city": "Arlington", "roof": "retractable" },
+    "rogers": { "name": "Rogers Centre", "city": "Toronto", "roof": "retractable" },
+    "nationals": { "name": "Nationals Park", "city": "Washington", "roof": "open" }
   },
   "teams": {
-    "rays": {
-      "name": "Rays", "city": "Tampa Bay", "abbr": "TB", "venue": "trop",
-      "squares": [
-        ["Caminero gets a hit", 1], ["Aranda reaches base", 1],
-        ["Chandler Simpson steals a base", 2], ["Yandy Díaz gets a hit", 2], ["Jorge Mateo pinch-runs", 2],
-        ["Bryan Baker pitches the 9th", 2], ["Liam Hicks drives in a run", 2],
-        ["Caminero homers", 3], ["DeLuca makes a diving catch", 3]
-      ],
-      "homeSquares": [
-        ["Ball hits a catwalk", 3], ["Cowbells heard on the broadcast", 2],
-        ["Broadcast mentions the 2008 World Series", 2]
-      ]
-    },
-    "brewers": {
-      "name": "Brewers", "city": "Milwaukee", "abbr": "MIL", "venue": "aff",
-      "squares": [
-        ["Chourio gets a hit", 1],
-        ["Yelich drives in a run", 2], ["Contreras wins an ABS challenge", 2], ["Bauers gets a hit", 2],
-        ["Cooper Pratt gets a hit", 2], ["Megill records the save", 2], ["Uribe hits 100 mph", 2],
-        ["Contreras throws out a base stealer", 3], ["Woodruff pitches in relief", 3],
-        ["Turang steals a base", 3], ["Pat Murphy argues a call", 3]
-      ],
-      "homeSquares": [
-        ["Bernie Brewer goes down the slide", 2], ["Sausage Race shown on TV", 2],
-        ["“Roll Out the Barrel” in the 7th", 2]
-      ]
-    }
+    "diamondbacks": { "name": "Diamondbacks", "city": "Arizona", "abbr": "ARI", "aliases": ["AZ"], "venue": "chase",
+      "homeSquares": [["Ball lands in the pool", 3]] },
+    "braves": { "name": "Braves", "city": "Atlanta", "abbr": "ATL", "venue": "truist" },
+    "orioles": { "name": "Orioles", "city": "Baltimore", "abbr": "BAL", "venue": "camden",
+      "homeSquares": [["Broadcast shows the B&O Warehouse", 1]] },
+    "redsox": { "name": "Red Sox", "city": "Boston", "abbr": "BOS", "venue": "fenway",
+      "homeSquares": [["Ball hits the Green Monster", 1], ["“Sweet Caroline” in the 8th", 1]] },
+    "cubs": { "name": "Cubs", "city": "Chicago", "abbr": "CHC", "venue": "wrigley",
+      "homeSquares": [["Guest sings the 7th-inning stretch", 1], ["Ball lost in the ivy", 3]] },
+    "whitesox": { "name": "White Sox", "city": "Chicago", "abbr": "CWS", "aliases": ["CHW"], "venue": "rate",
+      "homeSquares": [["Fireworks after a White Sox homer", 2]] },
+    "reds": { "name": "Reds", "city": "Cincinnati", "abbr": "CIN", "venue": "gabp",
+      "homeSquares": [["Riverboat smokestacks fire", 2]] },
+    "guardians": { "name": "Guardians", "city": "Cleveland", "abbr": "CLE", "venue": "progressive" },
+    "rockies": { "name": "Rockies", "city": "Colorado", "abbr": "COL", "venue": "coors",
+      "homeSquares": [["Broadcast mentions the altitude", 1], ["Purple row of seats shown", 3]] },
+    "tigers": { "name": "Tigers", "city": "Detroit", "abbr": "DET", "venue": "comerica" },
+    "astros": { "name": "Astros", "city": "Houston", "abbr": "HOU", "venue": "daikin",
+      "homeSquares": [["Outfield train runs after a homer", 2]] },
+    "royals": { "name": "Royals", "city": "Kansas City", "abbr": "KC", "aliases": ["KCR"], "venue": "kauffman",
+      "homeSquares": [["Outfield fountains shown", 1]] },
+    "angels": { "name": "Angels", "city": "Los Angeles", "abbr": "LAA", "venue": "angel",
+      "homeSquares": [["Rally Monkey appears", 2]] },
+    "dodgers": { "name": "Dodgers", "city": "Los Angeles", "abbr": "LAD", "venue": "dodger" },
+    "marlins": { "name": "Marlins", "city": "Miami", "abbr": "MIA", "venue": "loandepot" },
+    "brewers": { "name": "Brewers", "city": "Milwaukee", "abbr": "MIL", "venue": "aff",
+      "homeSquares": [["Bernie Brewer goes down the slide", 2], ["Sausage Race shown on TV", 2], ["“Roll Out the Barrel” in the 7th", 2]] },
+    "twins": { "name": "Twins", "city": "Minnesota", "abbr": "MIN", "venue": "target" },
+    "mets": { "name": "Mets", "city": "New York", "abbr": "NYM", "venue": "citi",
+      "homeSquares": [["Home run apple rises", 2]] },
+    "yankees": { "name": "Yankees", "city": "New York", "abbr": "NYY", "venue": "yankee",
+      "homeSquares": [["Bleacher Creatures roll call", 1]] },
+    "athletics": { "name": "Athletics", "city": "Sacramento", "abbr": "ATH", "aliases": ["OAK"], "venue": "sutter" },
+    "phillies": { "name": "Phillies", "city": "Philadelphia", "abbr": "PHI", "venue": "cbp",
+      "homeSquares": [["Phillie Phanatic shown", 1], ["Liberty Bell lights up after a homer", 2]] },
+    "pirates": { "name": "Pirates", "city": "Pittsburgh", "abbr": "PIT", "venue": "pnc",
+      "homeSquares": [["Roberto Clemente Bridge shown", 1], ["Pierogi Race shown", 2]] },
+    "padres": { "name": "Padres", "city": "San Diego", "abbr": "SD", "aliases": ["SDP"], "venue": "petco",
+      "homeSquares": [["Western Metal Supply building shown", 2]] },
+    "giants": { "name": "Giants", "city": "San Francisco", "abbr": "SF", "aliases": ["SFG"], "venue": "oracle",
+      "homeSquares": [["Kayaks shown in McCovey Cove", 2], ["Splash hit into McCovey Cove", 3]] },
+    "mariners": { "name": "Mariners", "city": "Seattle", "abbr": "SEA", "venue": "tmobile" },
+    "cardinals": { "name": "Cardinals", "city": "St. Louis", "abbr": "STL", "venue": "busch",
+      "homeSquares": [["Gateway Arch shown", 1]] },
+    "rays": { "name": "Rays", "city": "Tampa Bay", "abbr": "TB", "aliases": ["TBR"], "venue": "trop",
+      "homeSquares": [["Ball hits a catwalk", 3], ["Cowbells heard on the broadcast", 2]] },
+    "rangers": { "name": "Rangers", "city": "Texas", "abbr": "TEX", "venue": "globelife" },
+    "bluejays": { "name": "Blue Jays", "city": "Toronto", "abbr": "TOR", "venue": "rogers" },
+    "nationals": { "name": "Nationals", "city": "Washington", "abbr": "WSH", "aliases": ["WAS", "WSN"], "venue": "nationals",
+      "homeSquares": [["Presidents Race shown", 2]] }
   }
 }

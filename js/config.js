@@ -4,5 +4,7 @@
 // While they are empty, the site runs in demo mode: featured games only, no sign-in.
 window.BINGO_CONFIG = {
   supabaseUrl: '',
-  supabaseAnonKey: ''
+  supabaseAnonKey: '',
+  // Leagues to offer. Square libraries for 'nfl', 'nba' and 'nhl' are in data/ for later.
+  sports: ['mlb']
 };

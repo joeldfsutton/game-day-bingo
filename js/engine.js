@@ -35,9 +35,14 @@
   function libTeam(lib, team) {
     if (!lib || !lib.teams || !team) return null;
     if (team.key && lib.teams[team.key]) return lib.teams[team.key];
-    var abbr = (team.abbr || '').toUpperCase();
-    if (!abbr) return null;
-    for (var k in lib.teams) if (lib.teams.hasOwnProperty(k) && (lib.teams[k].abbr || '').toUpperCase() === abbr) return lib.teams[k];
+    var abbr = (team.abbr || '').toUpperCase(), name = (team.name || '').toLowerCase(), k, t;
+    for (k in lib.teams) {
+      if (!lib.teams.hasOwnProperty(k)) continue;
+      t = lib.teams[k];
+      if (abbr && ((t.abbr || '').toUpperCase() === abbr || (t.aliases || []).indexOf(abbr) !== -1)) return t;
+    }
+    // Fall back to the nickname, which is unique within MLB, NFL, NBA and NHL.
+    for (k in lib.teams) if (lib.teams.hasOwnProperty(k) && name && (lib.teams[k].name || '').toLowerCase() === name) return lib.teams[k];
     return null;
   }
 

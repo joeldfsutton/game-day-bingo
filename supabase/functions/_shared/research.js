@@ -29,6 +29,24 @@ const NHL_NICKNAMES = {
   WSH: 'Capitals', WPG: 'Jets'
 };
 
+// MLB nicknames by abbreviation, including the alternate codes some feeds use.
+const MLB_NICKNAMES = {
+  ARI: 'Diamondbacks', AZ: 'Diamondbacks', ATL: 'Braves', BAL: 'Orioles', BOS: 'Red Sox', CHC: 'Cubs',
+  CWS: 'White Sox', CHW: 'White Sox', CIN: 'Reds', CLE: 'Guardians', COL: 'Rockies', DET: 'Tigers',
+  HOU: 'Astros', KC: 'Royals', KCR: 'Royals', LAA: 'Angels', LAD: 'Dodgers', MIA: 'Marlins', MIL: 'Brewers',
+  MIN: 'Twins', NYM: 'Mets', NYY: 'Yankees', ATH: 'Athletics', OAK: 'Athletics', PHI: 'Phillies',
+  PIT: 'Pirates', SD: 'Padres', SDP: 'Padres', SF: 'Giants', SFG: 'Giants', SEA: 'Mariners', STL: 'Cardinals',
+  TB: 'Rays', TBR: 'Rays', TEX: 'Rangers', TOR: 'Blue Jays', WSH: 'Nationals', WAS: 'Nationals', WSN: 'Nationals'
+};
+
+function mlbTeam(t, fallbackName) {
+  const abbr = (t.abbreviation || '').toUpperCase();
+  const full = t.display_name || t.full_name || fallbackName || '';
+  const name = t.name || MLB_NICKNAMES[abbr] || fallbackName || full.split(' ').slice(-1)[0] || abbr;
+  const city = t.location || (full && full.endsWith(name) ? full.slice(0, full.length - name.length).trim() : '');
+  return { name, city, abbr, full: full || (city ? city + ' ' + name : name) };
+}
+
 function nhlTeam(t) {
   const abbr = t.tricode || t.abbreviation || '';
   const full = t.full_name || '';
@@ -46,7 +64,11 @@ function stdTeam(t) {
 /** Turns one BALLDONTLIE game into an `events` row (without research columns). */
 export function normalizeGame(sport, g) {
   let home, away, startsAt, venue = null;
-  if (sport === 'nhl') {
+  if (sport === 'mlb') {
+    home = mlbTeam(g.home_team || {}, g.home_team_name); away = mlbTeam(g.away_team || {}, g.away_team_name);
+    startsAt = g.date || g.start_time_utc || g.datetime;
+    venue = g.venue || null;
+  } else if (sport === 'nhl') {
     home = nhlTeam(g.home_team || {}); away = nhlTeam(g.away_team || {});
     startsAt = g.start_time_utc || g.game_date;
     venue = g.venue || null;
@@ -112,6 +134,20 @@ export function needsRefresh(ev, now) {
 
 // ---------- Prompt ----------
 
+// Extra research and calibration notes per sport.
+const SPORT_GUIDANCE = {
+  mlb: [
+    'Baseball specifics:',
+    '- Confirm the probable starting pitchers, and whether either team plans an opener or a bullpen game.',
+    '- Use the posted lineups if they are out (usually 3-4 hours before first pitch). If they are not, only name everyday starters who are healthy.',
+    '- Check which relievers have pitched a lot in the last few days, who closes, and hot and cold hitters over the last two weeks.',
+    '- Look for milestones (such as a player one home run from 30), streaks, ABS challenge habits, and the ballpark’s features and traditions.',
+    '- For open-air ballparks, check the weather forecast; rain or wind can be a square.',
+    '- Calibrate tiers: a regular hitter getting a hit is likely (about 65-75%); a specific player homering is a long shot (about 10-20%, up to about 30% for the top sluggers); a starter beating his usual strikeout total is a toss-up; a specific player stealing a base is usually a long shot unless he steals often.',
+    '- Good squares look like: "Skubal strikes out 8+", "Judge homers", "Chisholm steals a base", "Ball hits the Green Monster", "Closer earns the save".'
+  ].join('\n')
+};
+
 export function buildPrompt(ev, now) {
   const league = SPORT_LABELS[ev.sport] || ev.sport.toUpperCase();
   const start = new Date(ev.starts_at);
@@ -136,6 +172,8 @@ export function buildPrompt(ev, now) {
     '- tier: 1 = likely (over 70% in this game), 2 = toss-up (30-70%), 3 = long shot (under 30%). Base it on recent stats.',
     '- team: "home" or "away" for a square about one team or its players, otherwise null.',
     '- Write 10-14 player squares split evenly between the teams, 4-6 team squares, 2-4 venue or broadcast squares, and 4-6 storyline squares.',
+    '',
+    SPORT_GUIDANCE[ev.sport] || '',
     '',
     'After researching, first write a short summary of what you found (5-8 sentences), then finish with only a JSON object in a ```json code block, in this shape:',
     '{"venue": {"name": "...", "city": "..."},',

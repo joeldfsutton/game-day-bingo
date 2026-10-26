@@ -6,7 +6,10 @@
   var E = window.Bingo.engine;
   var CFG = window.BINGO_CONFIG || {};
   var WINDOW_AHEAD_H = 36, WINDOW_BEHIND_H = 3;
-  var SPORT_ORDER = ['nfl', 'nba', 'nhl', 'mlb'];
+  var SPORT_ORDER = ['mlb', 'nfl', 'nba', 'nhl'];
+  // Leagues the site offers. Baseball only until Opening Day 2027; the other
+  // leagues' square libraries stay in data/ for later.
+  var SPORTS = (CFG.sports && CFG.sports.length ? CFG.sports : ['mlb']).filter(function (s) { return SPORT_ORDER.indexOf(s) !== -1; });
   var REFRESH_WINDOW_MS = 3 * 3600 * 1000;
   var EVENT_COLUMNS = 'id,sport,starts_at,status_state,home_name,home_city,home_abbr,home_full,away_name,away_city,away_abbr,away_full,venue_name,venue_city,week,postseason,squares_status,squares,facts,sources,generated_at,refresh_count';
 
@@ -44,10 +47,11 @@
     });
   }
 
-  function featuredToGame(f) {
+  function featuredToGame(f, playerSets) {
     var L = st.libs[f.sport]; if (!L) return null;
     var h = L.teams[f.home] || {}, a = L.teams[f.away] || {}, v = (L.venues || {})[f.venue] || {};
     var side = function (key) { return key === f.home ? 'home' : key === f.away ? 'away' : null; };
+    var players = ((playerSets || {})[f.players] || []).map(function (s) { return { text: s[0], tier: s[1], side: side(s[2]), cat: 'team' }; });
     return {
       id: f.id, sport: f.sport, kind: 'featured', title: f.title, short: f.short, cardTitle: f.cardTitle,
       startsAt: new Date(f.startsAt),
@@ -55,7 +59,7 @@
       away: { key: f.away, name: a.name, city: a.city, abbr: a.abbr },
       venue: { name: v.name, city: v.city, roof: v.roof },
       facts: f.facts || [],
-      story: (f.story || []).map(function (s) { return { text: s[0], tier: s[1], side: side(s[2]) }; }),
+      story: (f.story || []).map(function (s) { return { text: s[0], tier: s[1], side: side(s[2]) }; }).concat(players),
       row: null
     };
   }
@@ -83,7 +87,7 @@
     if (!st.client) return Promise.resolve([]);
     var from = new Date(Date.now() - WINDOW_BEHIND_H * 3600000).toISOString();
     var to = new Date(Date.now() + WINDOW_AHEAD_H * 3600000).toISOString();
-    return st.client.from('events').select(EVENT_COLUMNS).gte('starts_at', from).lte('starts_at', to).order('starts_at')
+    return st.client.from('events').select(EVENT_COLUMNS).in('sport', SPORTS).gte('starts_at', from).lte('starts_at', to).order('starts_at')
       .then(function (res) {
         if (res.error) throw res.error;
         return (res.data || []).map(rowToGame).filter(Boolean);
@@ -95,13 +99,16 @@
       st.client = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
       st.live = true;
     }
-    var libsP = Promise.all(['mlb', 'nfl', 'nba', 'nhl'].map(function (s) {
+    var libsP = Promise.all(SPORTS.map(function (s) {
       return loadJson('data/' + s + '.json').then(function (j) { st.libs[s] = j; });
     }));
     var sessionP = st.client ? st.client.auth.getSession().then(function (r) { st.session = r.data.session; }) : Promise.resolve();
     Promise.all([libsP, sessionP]).then(function () {
       return Promise.all([
-        loadJson('data/games.json').then(function (j) { return (j.games || []).map(featuredToGame).filter(Boolean); }),
+        loadJson('data/games.json').then(function (j) {
+          return (j.games || []).filter(function (f) { return SPORTS.indexOf(f.sport) !== -1; })
+            .map(function (f) { return featuredToGame(f, j.playerSets); }).filter(Boolean);
+        }),
         loadEvents().catch(function (e) { showBanner('Couldn’t load the live schedule (' + (e.message || e) + '). Showing featured games only.'); return []; })
       ]);
     }).then(function (lists) {
@@ -173,7 +180,12 @@
 
   function renderGames() {
     var list = st.games.filter(function (g) { return st.filter === 'all' || g.sport === st.filter; });
-    if (!list.length) { $('games').innerHTML = '<p class="empty">No games in the next 36 hours. Check back later.</p>'; return; }
+    if (!list.length) {
+      $('games').innerHTML = '<p class="empty">' + (SPORTS.length === 1 && SPORTS[0] === 'mlb'
+        ? 'No MLB games in the next 36 hours. Spring training starts in late February, and Opening Day is Thursday, March 25, 2027.'
+        : 'No games in the next 36 hours. Check back later.') + '</p>';
+      return;
+    }
     var html = '', lastDay = '';
     list.forEach(function (g) {
       var d = dayLabel(g.startsAt);

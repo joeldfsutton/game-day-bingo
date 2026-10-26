@@ -1,6 +1,8 @@
 # Game Day Bingo
 
-Printable bingo cards written for one specific game. Visitors pick a game from the next 36 hours. Signed-in visitors get squares that Claude has researched for that game's players, venue and storylines, then download a PDF with one unique card per page and a host checklist.
+Printable bingo cards written for one specific baseball game. The site covers MLB only while it's polished for Opening Day, March 25, 2027. The code and square libraries for the NFL, NBA and NHL are in place for later; add them to `sports` in `js/config.js` and to the `SPORTS` secret to turn them on.
+
+Visitors pick a game from the next 36 hours. Signed-in visitors get squares that Claude has researched for that game's players, venue and storylines, then download a PDF with one unique card per page and a host checklist.
 
 Every card has at least 9 of its 25 squares about that game. When research isn't available, squares built from the team names and each stadium's traditions still meet that rule.
 
@@ -11,7 +13,7 @@ GitHub Pages (index.html, js/, data/)
    │  reads the schedule, signs people in
    ▼
 Supabase ── events table: schedule + researched squares, readable by everyone
-   ├── sync-events (hourly): pulls NFL, NBA and NHL games from BALLDONTLIE
+   ├── sync-events (hourly): pulls MLB games from BALLDONTLIE
    └── generate-squares (on first pick): asks Claude to research the game with
        web search, checks the JSON it returns, and saves it for everyone
 ```
@@ -34,7 +36,8 @@ Until `js/config.js` has a Supabase URL and key, the site runs without a backend
 | `js/engine.js` | Builds each game's square pool and deals balanced, unique cards |
 | `js/pdf.js` | Draws the cards and host checklist with jsPDF |
 | `js/config.js` | Supabase URL and public anon key (empty = demo mode) |
-| `data/nfl.json`, `nba.json`, `nhl.json`, `mlb.json` | Per-sport squares: plays for any game, team-name templates, stadium traditions |
+| `data/mlb.json` | Baseball squares: plays for any game, team-name templates, all 30 teams and ballparks with roofs and home traditions |
+| `data/nfl.json`, `nba.json`, `nhl.json` | Square libraries for other leagues, not offered yet |
 | `data/games.json` | Hand-written featured games, such as the World Series |
 | `supabase/migrations/` | Database tables and access rules |
 | `supabase/functions/` | The two server functions and their shared logic |

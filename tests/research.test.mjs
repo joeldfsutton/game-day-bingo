@@ -34,6 +34,28 @@ test('normalizes NFL, NBA and NHL games', () => {
   assert.equal(nhl.away_name, 'Mammoth');
 });
 
+test('normalizes MLB games, including alternate abbreviations', () => {
+  const g = normalizeGame('mlb', { id: 11, date: '2027-03-25T17:10:00.000Z', venue: 'Fenway Park', status: 'scheduled',
+    home_team_name: 'Red Sox', away_team_name: 'White Sox',
+    home_team: { display_name: 'Boston Red Sox', abbreviation: 'BOS' },
+    away_team: { display_name: 'Chicago White Sox', abbreviation: 'CHW' } });
+  assert.equal(g.id, 'mlb-11');
+  assert.equal(g.home_name, 'Red Sox');
+  assert.equal(g.home_city, 'Boston');
+  assert.equal(g.away_name, 'White Sox');
+  assert.equal(g.away_city, 'Chicago');
+  assert.equal(g.venue_name, 'Fenway Park');
+  const a = normalizeGame('mlb', { id: 12, date: '2027-03-25T20:00:00.000Z', home_team: { display_name: 'Athletics', abbreviation: 'ATH' }, away_team: { display_name: 'Seattle Mariners', abbreviation: 'SEA' } });
+  assert.equal(a.home_name, 'Athletics');
+  assert.equal(a.away_city, 'Seattle');
+});
+
+test('baseball prompt includes baseball guidance', () => {
+  const { system } = buildPrompt({ ...baseEvent, sport: 'mlb', home_full: 'Boston Red Sox', away_full: 'New York Yankees' }, new Date('2027-03-24T12:00:00Z'));
+  assert.match(system, /probable starting pitchers/);
+  assert.match(system, /posted lineups/);
+});
+
 test('date window covers 36 hours ahead', () => {
   const d = datesToFetch(new Date('2026-10-26T18:00:00Z'), 36);
   assert.deepEqual(d, ['2026-10-26', '2026-10-27', '2026-10-28']);

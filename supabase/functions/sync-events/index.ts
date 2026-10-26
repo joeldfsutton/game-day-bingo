@@ -1,4 +1,5 @@
-// sync-events: pulls NFL, NBA and NHL schedules for the next 36 hours into `events`.
+// sync-events: pulls schedules for the next 36 hours into `events`. Baseball only for now;
+// set the SPORTS secret (for example "mlb,nfl") to add other leagues later.
 // Run hourly by pg_cron (see SETUP.md). Requires the x-cron-secret header.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
@@ -8,10 +9,10 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const BDL_KEY = Deno.env.get('BALLDONTLIE_API_KEY') ?? '';
 const CRON_SECRET = Deno.env.get('CRON_SECRET') ?? '';
-const SPORTS = (Deno.env.get('SPORTS') ?? 'nfl,nba,nhl').split(',').map((s) => s.trim()).filter(Boolean);
+const SPORTS = (Deno.env.get('SPORTS') ?? 'mlb').split(',').map((s) => s.trim()).filter(Boolean);
 const WINDOW_HOURS = Number(Deno.env.get('WINDOW_HOURS') ?? '36');
 
-const PATHS: Record<string, string> = { nfl: '/nfl/v1/games', nba: '/nba/v1/games', nhl: '/nhl/v1/games' };
+const PATHS: Record<string, string> = { mlb: '/mlb/v1/games', nfl: '/nfl/v1/games', nba: '/nba/v1/games', nhl: '/nhl/v1/games' };
 
 async function fetchGames(sport: string, dates: string[]) {
   const all: Record<string, unknown>[] = [];
