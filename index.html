@@ -267,7 +267,7 @@ input[type="number"], input[type="text"], select { font: inherit; color: var(--i
       squares: [
         ['Caminero gets a hit', 1], ['Aranda reaches base', 1], ['Kevin Cash makes a pitching change', 1],
         ['Chandler Simpson steals a base', 2], ['Yandy Díaz gets a hit', 2], ['Jorge Mateo pinch-runs', 2],
-        ['Bryan Baker pitches the 9th', 2], ['Rays score first', 2],
+        ['Bryan Baker pitches the 9th', 2], ['Rays score first', 2], ['Liam Hicks drives in a run', 2],
         ['Caminero homers', 3], ['DeLuca makes a diving catch', 3], ['Rays steal 2+ bases', 3]
       ]
     },
@@ -302,30 +302,43 @@ input[type="number"], input[type="text"], select { font: inherit; color: var(--i
   };
 
   var GAMES = {
-    g2: {
-      key: 'g2', title: 'World Series Game 2', short: 'Game 2', iso: '2026-10-24',
-      date: 'Sat, Oct 24', time: '7:00 PM CT', away: 'rays', home: 'brewers', venue: 'aff',
-      series: 'Brewers lead 1–0 after a 3–2 win in Game 1',
-      probables: 'Drew Rasmussen (TB) vs. Logan Henderson (MIL)',
-      story: [
-        ['Broadcast mentions the Adames trade', 1],
-        ['Rasmussen strikes out 6+', 2, 'rays'], ['Rasmussen pitches 6+ innings', 2, 'rays'],
-        ['Henderson strikes out 5+', 2, 'brewers'], ['Henderson pitches into the 6th', 2, 'brewers'],
-        ['Misiorowski’s 103.5 mph pitch replayed', 2], ['Game 1’s overturned double play replayed', 2],
-        ['Broadcast mentions 1982', 2], ['Rays tie the series 1–1', 2, 'rays'],
-        ['Brewers go up 2–0 in the series', 2, 'brewers']
-      ]
-    },
     g3: {
       key: 'g3', title: 'World Series Game 3', short: 'Game 3', iso: '2026-10-26',
       date: 'Mon, Oct 26', time: '7:00 PM CT', away: 'brewers', home: 'rays', venue: 'trop',
-      series: 'Series moves to St. Petersburg',
-      probables: 'Freddy Peralta (TB) vs. to be announced (MIL)',
+      series: 'Brewers lead 2–0 after a 5–4 comeback win in Game 2',
+      probables: 'Robert Gasser (MIL) vs. Freddy Peralta (TB)',
       story: [
         ['Broadcast mentions Peralta’s Brewers years', 1],
+        ['Broadcast replays the Game 2 comeback', 1],
         ['Peralta strikes out 6+', 2, 'rays'], ['Peralta pitches 6+ innings', 2, 'rays'],
-        ['Brewers starter goes 5+ innings', 2, 'brewers'], ['Rays bullpen gets 9+ outs', 2, 'rays'],
-        ['Highlight from Game 2 replayed', 1]
+        ['Gasser strikes out 5+', 2, 'brewers'], ['Gasser pitches 5+ innings', 2, 'brewers'],
+        ['Brewers bullpen gets 12+ outs', 2, 'brewers'], ['Rays score in the 1st inning', 2, 'rays'],
+        ['Rays win to make it 2–1', 2, 'rays'], ['Brewers go up 3–0 in the series', 2, 'brewers'],
+        ['Broadcast mentions 1982', 2]
+      ]
+    },
+    g4: {
+      key: 'g4', title: 'World Series Game 4', short: 'Game 4', iso: '2026-10-27',
+      date: 'Tue, Oct 27', time: '7:00 PM CT', away: 'brewers', home: 'rays', venue: 'trop',
+      series: 'Depends on Game 3: the Brewers lead 2–0 going in',
+      probables: 'To be announced',
+      story: [
+        ['Broadcast replays a Game 3 highlight', 1],
+        ['Rays starter pitches 5+ innings', 2, 'rays'], ['Brewers starter pitches 5+ innings', 2, 'brewers'],
+        ['Broadcast shows the series score graphic', 1], ['Broadcast mentions 1982', 2],
+        ['A reliever throws 3+ innings', 3]
+      ]
+    },
+    g5: {
+      key: 'g5', title: 'World Series Game 5 (if needed)', short: 'Game 5', iso: '2026-10-28',
+      date: 'Wed, Oct 28', time: '7:00 PM CT', away: 'brewers', home: 'rays', venue: 'trop',
+      series: 'Played only if neither team has won four games',
+      probables: 'To be announced',
+      story: [
+        ['Broadcast replays a Game 4 highlight', 1],
+        ['Rays starter pitches 5+ innings', 2, 'rays'], ['Brewers starter pitches 5+ innings', 2, 'brewers'],
+        ['Broadcast shows the series score graphic', 1], ['Broadcast mentions 1982', 2],
+        ['A reliever throws 3+ innings', 3]
       ]
     }
   };
@@ -362,7 +375,18 @@ input[type="number"], input[type="text"], select { font: inherit; color: var(--i
   function lineOk(cells) { return LINES.every(function (l) { return l.filter(function (i) { return cells[i] && cells[i].tier === 3; }).length <= 2; }); }
 
   // ---------- State ----------
-  var st = { gameKey: 'g2', count: 8, diff: 'standard', free: true, title: '', paper: 'letter', perPage: 1, ink: false, checklist: true, seed: 2410, idx: 0, cards: [], pool: [] };
+  function todayIso() {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  // Games already played drop off the list automatically, using the visitor's local date.
+  function upcomingKeys() {
+    var t = todayIso();
+    var keys = Object.keys(GAMES).filter(function (k) { return GAMES[k].iso >= t; });
+    return keys.length ? keys : Object.keys(GAMES);
+  }
+
+  var st = { gameKey: upcomingKeys()[0], count: 8, diff: 'standard', free: true, title: '', paper: 'letter', perPage: 1, ink: false, checklist: true, seed: 2410, idx: 0, cards: [], pool: [] };
 
   function buildPool(g) {
     var out = [];
@@ -480,7 +504,7 @@ input[type="number"], input[type="text"], select { font: inherit; color: var(--i
 
   function renderGames() {
     var html = '';
-    Object.keys(GAMES).forEach(function (k) {
+    upcomingKeys().forEach(function (k) {
       var g = GAMES[k], a = TEAMS[g.away], h = TEAMS[g.home];
       html += '<label class="game-opt"><input type="radio" name="game" id="game-' + k + '" value="' + k + '"' + (k === st.gameKey ? ' checked' : '') + '>' +
         '<strong>' + esc(g.title) + (isToday(g.iso) ? '<span class="when">Tonight</span>' : '') + '</strong>' +
