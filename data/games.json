@@ -1,0 +1,42 @@
+{
+  "about": "Hand-written featured games. They appear alongside the live schedule and in demo mode. startsAt uses the game's local offset. In story and players, the third value is the team key the square is about, or leave it out.",
+  "games": [
+    {
+      "id": "mlb-ws-3", "sport": "mlb", "title": "World Series Game 3", "short": "Game 3",
+      "cardTitle": "World Series Bingo", "startsAt": "2026-10-26T20:00:00-04:00",
+      "away": "brewers", "home": "rays", "venue": "trop",
+      "facts": [["Starters", "Robert Gasser (MIL) vs. Freddy Peralta (TB)"], ["Series", "Brewers lead 2–0 after a 5–4 comeback in Game 2"]],
+      "story": [
+        ["Broadcast mentions Peralta’s Brewers years", 1],
+        ["Broadcast replays the Game 2 comeback", 1],
+        ["Peralta strikes out 6+", 2, "rays"], ["Peralta pitches 6+ innings", 2, "rays"],
+        ["Gasser strikes out 5+", 2, "brewers"], ["Gasser pitches 5+ innings", 2, "brewers"],
+        ["Brewers bullpen gets 12+ outs", 2, "brewers"],
+        ["Rays win to make it 2–1", 2, "rays"], ["Brewers go up 3–0 in the series", 2, "brewers"],
+        ["Broadcast mentions 1982", 2]
+      ]
+    },
+    {
+      "id": "mlb-ws-4", "sport": "mlb", "title": "World Series Game 4", "short": "Game 4",
+      "cardTitle": "World Series Bingo", "startsAt": "2026-10-27T20:00:00-04:00",
+      "away": "brewers", "home": "rays", "venue": "trop",
+      "facts": [["Starters", "To be announced"], ["Series", "Depends on Game 3; the Brewers led 2–0 going in"]],
+      "story": [
+        ["Broadcast replays a Game 3 highlight", 1], ["Broadcast shows the series score graphic", 1],
+        ["Rays starter pitches 5+ innings", 2, "rays"], ["Brewers starter pitches 5+ innings", 2, "brewers"],
+        ["Broadcast mentions 1982", 2], ["A reliever throws 3+ innings", 3]
+      ]
+    },
+    {
+      "id": "mlb-ws-5", "sport": "mlb", "title": "World Series Game 5 (if needed)", "short": "Game 5",
+      "cardTitle": "World Series Bingo", "startsAt": "2026-10-28T20:00:00-04:00",
+      "away": "brewers", "home": "rays", "venue": "trop",
+      "facts": [["Starters", "To be announced"], ["Series", "Played only if neither team has won four games"]],
+      "story": [
+        ["Broadcast replays a Game 4 highlight", 1], ["Broadcast shows the series score graphic", 1],
+        ["Rays starter pitches 5+ innings", 2, "rays"], ["Brewers starter pitches 5+ innings", 2, "brewers"],
+        ["Broadcast mentions 1982", 2], ["A reliever throws 3+ innings", 3]
+      ]
+    }
+  ]
+}

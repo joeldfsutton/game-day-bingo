@@ -1,0 +1,66 @@
+{
+  "sport": "mlb",
+  "label": "MLB",
+  "bingoTitle": "Baseball Bingo",
+  "freeLabel": "First pitch",
+  "tiers": "1 = likely (over 70%), 2 = toss-up (30-70%), 3 = long shot (under 30%)",
+  "generic": [
+    ["Strikeout looking", 1], ["Pitching change", 1], ["Mound visit", 1], ["Walk", 1],
+    ["Fan catches a foul ball", 1], ["1-2-3 inning", 1], ["Strikeout ends an inning", 1],
+    ["Runner stranded on 3rd", 1], ["Ground-ball double play", 1], ["Pinch hitter", 1],
+    ["Pickoff throw", 1], ["Full-count walk", 1], ["Leadoff batter reaches base", 1],
+    ["ABS ball-strike challenge", 1], ["Double", 1],
+    ["Home run", 2], ["Stolen base", 2], ["Hit by pitch", 2], ["Wild pitch", 2], ["Fielding error", 2],
+    ["Diving catch", 2], ["Sacrifice fly", 2], ["Two-out RBI", 2], ["Infield single", 2],
+    ["Bases loaded", 2], ["Caught stealing", 2], ["Lead changes hands", 2], ["Broken bat", 2],
+    ["Bunt attempt", 2], ["Replay review", 2], ["Ground-rule double", 2], ["Scoreless 1st inning", 2],
+    ["Passed ball", 2], ["Multi-run homer", 2],
+    ["Runner thrown out at home", 3], ["Triple", 3], ["Extra innings", 3], ["Pitch clock violation", 3],
+    ["Balk", 3], ["Grand slam", 3], ["Manager ejected", 3], ["Back-to-back homers", 3],
+    ["Catcher’s interference", 3]
+  ],
+  "teamTemplates": [
+    ["{team} score first", 2], ["{team} hit a home run", 2], ["{team} steal a base", 2],
+    ["{team} turn a double play", 1], ["{team} make a pitching change", 1],
+    ["{team} score in the 1st inning", 2], ["{team} use a pinch hitter", 1],
+    ["{team} score 5+ runs", 2], ["{team} leave the bases loaded", 3]
+  ],
+  "roofSquares": {
+    "open": [["Rain delay", 3]],
+    "dome": [],
+    "retractable": [["Broadcast mentions the roof", 2]]
+  },
+  "venues": {
+    "aff": { "name": "American Family Field", "city": "Milwaukee", "roof": "retractable" },
+    "trop": { "name": "Tropicana Field", "city": "St. Petersburg", "roof": "dome" }
+  },
+  "teams": {
+    "rays": {
+      "name": "Rays", "city": "Tampa Bay", "abbr": "TB", "venue": "trop",
+      "squares": [
+        ["Caminero gets a hit", 1], ["Aranda reaches base", 1],
+        ["Chandler Simpson steals a base", 2], ["Yandy Díaz gets a hit", 2], ["Jorge Mateo pinch-runs", 2],
+        ["Bryan Baker pitches the 9th", 2], ["Liam Hicks drives in a run", 2],
+        ["Caminero homers", 3], ["DeLuca makes a diving catch", 3]
+      ],
+      "homeSquares": [
+        ["Ball hits a catwalk", 3], ["Cowbells heard on the broadcast", 2],
+        ["Broadcast mentions the 2008 World Series", 2]
+      ]
+    },
+    "brewers": {
+      "name": "Brewers", "city": "Milwaukee", "abbr": "MIL", "venue": "aff",
+      "squares": [
+        ["Chourio gets a hit", 1],
+        ["Yelich drives in a run", 2], ["Contreras wins an ABS challenge", 2], ["Bauers gets a hit", 2],
+        ["Cooper Pratt gets a hit", 2], ["Megill records the save", 2], ["Uribe hits 100 mph", 2],
+        ["Contreras throws out a base stealer", 3], ["Woodruff pitches in relief", 3],
+        ["Turang steals a base", 3], ["Pat Murphy argues a call", 3]
+      ],
+      "homeSquares": [
+        ["Bernie Brewer goes down the slide", 2], ["Sausage Race shown on TV", 2],
+        ["“Roll Out the Barrel” in the 7th", 2]
+      ]
+    }
+  }
+}

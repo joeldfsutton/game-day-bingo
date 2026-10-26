@@ -1,0 +1,35 @@
+name: Backend
+
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'tests/**', '.github/workflows/backend.yml']
+  pull_request:
+    paths: ['supabase/**', 'tests/**']
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+
+  deploy:
+    # Runs only after you add the SUPABASE_PROJECT_REF variable and the
+    # SUPABASE_ACCESS_TOKEN secret to this repository (see SETUP.md, step 5).
+    needs: test
+    if: github.event_name != 'pull_request' && vars.SUPABASE_PROJECT_REF != ''
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase functions deploy generate-squares --project-ref ${{ vars.SUPABASE_PROJECT_REF }}
+      - run: supabase functions deploy sync-events --no-verify-jwt --project-ref ${{ vars.SUPABASE_PROJECT_REF }}

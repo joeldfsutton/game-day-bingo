@@ -1,0 +1,29 @@
+{
+  "sport": "nba",
+  "label": "NBA",
+  "bingoTitle": "Basketball Bingo",
+  "freeLabel": "Tip-off",
+  "tiers": "1 = likely (over 70%), 2 = toss-up (30-70%), 3 = long shot (under 30%)",
+  "generic": [
+    ["Alley-oop dunk", 1], ["And-one", 1], ["Air ball", 1], ["Back-to-back threes", 1],
+    ["Fast-break dunk", 1], ["Travel called", 1], ["Charge called", 1], ["10-0 run", 1],
+    ["Replay review", 1], ["Double-double", 1], ["Loose-ball foul", 1], ["Half-court heave at a buzzer", 1],
+    ["Technical foul", 2], ["Shot-clock violation", 2], ["Goaltending call", 2], ["Coach’s challenge", 2],
+    ["Missed dunk", 2], ["Jump ball after the opening tip", 2], ["A player scores 30+", 2],
+    ["A player hits 5+ threes", 2], ["Lead of 20+ points", 2], ["Buzzer-beater to end a quarter", 2],
+    ["Celebrity shown courtside", 2], ["Defensive three seconds", 2], ["A team scores 120+", 2],
+    ["Triple-double", 3], ["Overtime", 3], ["Player fouls out", 3], ["Flagrant foul", 3],
+    ["Four-point play", 3], ["Ejection", 3], ["Half-court shot goes in", 3], ["Ball stuck on the rim", 3],
+    ["Comeback from 15+ down", 3], ["Clear-path foul", 3], ["Free-throw air ball", 3]
+  ],
+  "teamTemplates": [
+    ["{team} score the first basket", 2], ["{team} lead after the 1st quarter", 2],
+    ["{team} go on a 10-0 run", 2], ["{team} hit 15+ threes", 2], ["{team} score 120+", 2],
+    ["{team} get a technical foul", 2], ["{team} challenge a call", 2], ["{team} lead by 15+", 2],
+    ["{team} win the game", 2], ["{team} call timeout in the 1st quarter", 1],
+    ["{team} block a shot into the stands", 2], ["{team} hit a buzzer-beater", 3]
+  ],
+  "roofSquares": { "open": [], "dome": [], "retractable": [] },
+  "venues": {},
+  "teams": {}
+}

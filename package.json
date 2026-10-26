@@ -1,0 +1,8 @@
+{
+  "name": "game-day-bingo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/research.test.mjs"
+  }
+}

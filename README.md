@@ -1,36 +1,57 @@
 # Game Day Bingo
 
-Free printable bingo cards written for one specific game. Every card has at least 9 of its 25 squares about that game's teams, players, ballpark or storylines. The rest are plays that can happen in any game.
+Printable bingo cards written for one specific game. Visitors pick a game from the next 36 hours. Signed-in visitors get squares that Claude has researched for that game's players, venue and storylines, then download a PDF with one unique card per page and a host checklist.
 
-The whole site is one file, `index.html`. It runs entirely in the browser and needs no server or database. PDFs are built on the visitor's device with [jsPDF](https://github.com/parallax/jsPDF).
+Every card has at least 9 of its 25 squares about that game. When research isn't available, squares built from the team names and each stadium's traditions still meet that rule.
 
-## Publish it with GitHub Pages
+## How it works
 
-1. Create a new public repository on GitHub, for example `game-day-bingo`.
-2. Upload `index.html` and this `README.md` to the repository: **Add file → Upload files**, then **Commit changes**.
-3. Open **Settings → Pages**. Under **Build and deployment**, set **Source** to **Deploy from a branch**, pick the `main` branch and the `/ (root)` folder, then select **Save**.
-4. After a minute or two the site is live at `https://<your-username>.github.io/game-day-bingo/`.
+```
+GitHub Pages (index.html, js/, data/)
+   │  reads the schedule, signs people in
+   ▼
+Supabase ── events table: schedule + researched squares, readable by everyone
+   ├── sync-events (hourly): pulls NFL, NBA and NHL games from BALLDONTLIE
+   └── generate-squares (on first pick): asks Claude to research the game with
+       web search, checks the JSON it returns, and saves it for everyone
+```
 
-To use your own domain, enter it under **Settings → Pages → Custom domain**, then add the DNS record your domain registrar asks for.
+- **Research once, share with everyone.** The first signed-in visitor to pick a game triggers research, which usually takes under a minute. Everyone after that gets the saved squares instantly. Squares written more than 3 hours before a game are refreshed once inside that window, so confirmed lineups and late scratches are picked up.
+- **Checked before use.** The server drops squares that are too long, mention injuries or betting, or lack a team, and rejects a result that has fewer than 14 usable squares. A failed or rate-limited research run falls back to standard squares.
+- **Sources shown.** The pages Claude cited are listed under the card and on the host checklist.
+- **Spending limits.** Research is capped per user per hour and across the whole site per day. See `SETUP.md`.
 
-## Adding a game
+## Demo mode
 
-The square library is near the top of the script in `index.html`:
+Until `js/config.js` has a Supabase URL and key, the site runs without a backend. It shows the hand-written featured games in `data/games.json` with standard squares, and anyone can print. To turn on the live version, follow **[SETUP.md](SETUP.md)**.
 
-- `GENERIC`: plays that can happen in any game.
-- `TEAMS`: squares for each team and its players.
-- `VENUES`: squares for each ballpark and its broadcast.
-- `GAMES`: one entry per game, with the date, time, teams, venue, probable starters and storyline squares.
+## Files
 
-Each square has a tier: `1` is likely (over 70%), `2` is a toss-up (30–70%) and `3` is a long shot (under 30%). To add a game, copy an entry in `GAMES` and change its details. Team, player and storyline squares go out of date quickly, so check them before each game.
+| Path | What it is |
+| --- | --- |
+| `index.html` | The page and its styles |
+| `js/app.js` | Game list, sign-in, research requests, card preview |
+| `js/engine.js` | Builds each game's square pool and deals balanced, unique cards |
+| `js/pdf.js` | Draws the cards and host checklist with jsPDF |
+| `js/config.js` | Supabase URL and public anon key (empty = demo mode) |
+| `data/nfl.json`, `nba.json`, `nhl.json`, `mlb.json` | Per-sport squares: plays for any game, team-name templates, stadium traditions |
+| `data/games.json` | Hand-written featured games, such as the World Series |
+| `supabase/migrations/` | Database tables and access rules |
+| `supabase/functions/` | The two server functions and their shared logic |
+| `tests/` | Tests for the server logic. Run `npm test` |
 
 ## Card rules
 
 - At least 9 of the 25 squares are about the specific game, split between the two teams.
-- The difficulty setting controls the mix of likely, toss-up and long-shot squares.
+- When a game has been researched, most of those come from the research.
+- The difficulty setting controls the mix of likely (over 70%), toss-up (30–70%) and long-shot (under 30%) squares.
 - No row, column or diagonal has more than two long shots.
 - No two cards in a set share more than 60% of their squares.
 
+## Adding a featured game
+
+Copy an entry in `data/games.json` and change its details. `away`, `home` and `venue` are keys from the sport's file in `data/`. In `story`, each square is `[text, tier, team key]`, and the team key can be left out.
+
 ## Not affiliated
 
-This is a fan project. It is not affiliated with Major League Baseball or any team. Team and player names are used only to describe the games. Do not add league or team logos.
+This is a fan project. It is not affiliated with any league or team. Team and player names are used only to describe the games. Don't add league or team logos.

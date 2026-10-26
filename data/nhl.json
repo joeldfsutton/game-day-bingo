@@ -1,0 +1,30 @@
+{
+  "sport": "nhl",
+  "label": "NHL",
+  "bingoTitle": "Hockey Bingo",
+  "freeLabel": "Puck drop",
+  "tiers": "1 = likely (over 70%), 2 = toss-up (30-70%), 3 = long shot (under 30%)",
+  "generic": [
+    ["Icing", 1], ["Tripping penalty", 1], ["Hooking penalty", 1], ["Shot hits the post", 1],
+    ["Power play", 1], ["Broken stick", 1], ["Scrum after the whistle", 1], ["Breakaway", 1],
+    ["Goal off a deflection", 1], ["Glove save on replay", 1], ["Goalie pulled for an extra skater", 1],
+    ["Roughing penalty", 1], ["Interference penalty", 1],
+    ["Power-play goal", 2], ["Empty-net goal", 2], ["Goal reviewed", 2], ["Coach’s challenge", 2],
+    ["Puck over the glass penalty", 2], ["Two goals within a minute", 2], ["Scoreless 1st period", 2],
+    ["Goal from the point", 2], ["Slashing penalty", 2], ["High-sticking penalty", 2],
+    ["Offside review", 2], ["Lead changes hands", 2],
+    ["Overtime", 3], ["Shootout", 3], ["Hat trick", 3], ["Shorthanded goal", 3], ["Penalty shot", 3],
+    ["Fight", 3], ["Too many men on the ice", 3], ["Five-on-three power play", 3],
+    ["Goal in the first minute", 3], ["Goalie replaced mid-game", 3], ["Major penalty", 3]
+  ],
+  "teamTemplates": [
+    ["{team} score first", 2], ["{team} score on the power play", 2], ["{team} kill a penalty", 1],
+    ["{team} pull their goalie", 2], ["{team} take a penalty in the 1st", 1],
+    ["{team} outshoot their opponent", 2], ["{team} win the game", 2], ["{team} score 4+ goals", 2],
+    ["{team} goalie makes 30+ saves", 2], ["{team} hit the post", 1], ["{team} score in the 3rd period", 1],
+    ["{team} score shorthanded", 3]
+  ],
+  "roofSquares": { "open": [], "dome": [], "retractable": [] },
+  "venues": {},
+  "teams": {}
+}

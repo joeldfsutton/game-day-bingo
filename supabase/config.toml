@@ -1,0 +1,9 @@
+# Only the settings this project changes. `supabase init` adds the rest if you run it.
+
+[functions.sync-events]
+# Called by the hourly cron job, which sends a shared secret instead of a user token.
+verify_jwt = false
+
+[functions.generate-squares]
+# Called by signed-in visitors. The function also checks the user itself.
+verify_jwt = true
